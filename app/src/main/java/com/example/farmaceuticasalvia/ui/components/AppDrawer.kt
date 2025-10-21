@@ -48,6 +48,6 @@ fun defaultDrawerItems(
     onRegister: () -> Unit
 ): List<DrawerItem> = listOf(
     DrawerItem("Home", Icons.Filled.Home , onHome),
-    DrawerItem("Login", Icons.Filled.AccountCircle , onHome),
-    DrawerItem("Register", Icons.Filled.Person , onHome)
+    DrawerItem("Login", Icons.Filled.AccountCircle , onLogin),
+    DrawerItem("Register", Icons.Filled.Person , onRegister)
 )
