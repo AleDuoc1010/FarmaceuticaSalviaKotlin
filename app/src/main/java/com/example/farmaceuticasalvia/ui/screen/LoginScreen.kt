@@ -31,29 +31,37 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModel
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.farmaceuticasalvia.data.local.storage.UserPreferences
+import com.example.farmaceuticasalvia.ui.theme.Beige
 
 @Composable
 fun LoginScreenVm(
+    vm: AuthViewModel,
     onLoginOkNavigateHome : () -> Unit,
-    onGoRegister : () -> Unit
+    onGoRegister : () -> Unit,
 ){
-    val vm : AuthViewModel = viewModel()
     val state by vm.login.collectAsStateWithLifecycle()
 
-    if(state.success){
-        vm.clearLoginResult()
-        onLoginOkNavigateHome
+    val context = LocalContext.current
+    val userPrefs = remember { UserPreferences(context) }
+
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            userPrefs.setLoggedIn(true)
+            vm.clearLoginResult()
+            onLoginOkNavigateHome()
+        }
     }
 
     LoginScreen(
@@ -87,9 +95,9 @@ private fun LoginScreen(
     onEmailChange: (String) -> Unit,                         // Handler cambio email
     onPassChange: (String) -> Unit,                          // Handler cambio password
     onSubmit: () -> Unit,                                    // Acción enviar
-    onGoRegister: () -> Unit
+    onGoRegister: () -> Unit,
 ) {
-    val bg = MaterialTheme.colorScheme.secondaryContainer
+    val bg = Beige
 
     var showPass by remember { mutableStateOf(false) }
 
@@ -190,7 +198,7 @@ private fun LoginScreen(
                         Spacer(Modifier.width(8.dp))
                         Text("Validando...")
                     } else {
-                        Text("Entrar")
+                            Text("Entrar")
                     }
                 }
 

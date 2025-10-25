@@ -6,6 +6,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -14,10 +15,20 @@ import androidx.navigation.compose.composable
 import com.example.farmaceuticasalvia.ui.components.AppDrawer
 import com.example.farmaceuticasalvia.ui.components.AppTopBar
 import com.example.farmaceuticasalvia.ui.components.defaultDrawerItems
+import com.example.farmaceuticasalvia.ui.screen.CartScreen
+import com.example.farmaceuticasalvia.ui.screen.HomeScreen
+import com.example.farmaceuticasalvia.ui.screen.LoginScreenVm
+import com.example.farmaceuticasalvia.ui.screen.ProductScreen
+import com.example.farmaceuticasalvia.ui.screen.RegisterScreenVm
+import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModel
+import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
+import androidx.compose.runtime.getValue
 import kotlinx.coroutines.launch
 
 @Composable
-fun AppNavGraph(navController: NavHostController){
+fun AppNavGraph(navController: NavHostController,
+                authViewModel: AuthViewModel,
+                productViewModel: ProductViewModel){
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -25,6 +36,8 @@ fun AppNavGraph(navController: NavHostController){
     val goHome: () -> Unit  = {navController.navigate(Route.Home.path)}
     val goLogin: () -> Unit = {navController.navigate(Route.Login.path)}
     val goRegister: () -> Unit = {navController.navigate(Route.Register.path)}
+    val goProducts: () -> Unit = {navController.navigate(Route.Products.path)}
+    val goCart: () -> Unit = {navController.navigate(Route.Cart.path)}
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -34,7 +47,7 @@ fun AppNavGraph(navController: NavHostController){
                 items = defaultDrawerItems(
                     onHome = {
                         scope.launch { drawerState.close() }
-                        goLogin()
+                        goHome()
                     },
                     onLogin = {
                         scope.launch { drawerState.close() }
@@ -42,7 +55,15 @@ fun AppNavGraph(navController: NavHostController){
                     },
                     onRegister = {
                         scope.launch { drawerState.close() }
-                        goLogin()
+                        goRegister()
+                    },
+                    onProducts = {
+                        scope.launch { drawerState.close() }
+                        goProducts()
+                    },
+                    onCart = {
+                        scope.launch { drawerState.close() }
+                        goCart()
                     }
                 )
             )
@@ -52,9 +73,6 @@ fun AppNavGraph(navController: NavHostController){
             topBar = {
                 AppTopBar(
                     onOpenDrawer = {scope.launch { drawerState.open() }},
-                    onHome = goHome,
-                    onLogin = goLogin,
-                    onRegister = goRegister
                 )
             }
         ){ innerPadding ->
@@ -64,14 +82,39 @@ fun AppNavGraph(navController: NavHostController){
                 modifier = Modifier.padding(innerPadding)
             ){
                 composable(Route.Home.path){
+                    HomeScreen(
+                        onGoLogin = goLogin,
+                        onGoRegister = goRegister
+                    )
                 }
+
                 composable(Route.Login.path){
+                    LoginScreenVm(
+                        vm = authViewModel,
+                        onLoginOkNavigateHome = goHome,
+                        onGoRegister = goRegister,
+                    )
                 }
+
                 composable(Route.Register.path){
+                    RegisterScreenVm(
+                        vm = authViewModel,
+                        onRegisterNavigateLogin = goLogin,
+                        onGoLogin = goLogin
+                    )
                 }
 
-            }
+                composable (Route.Products.path){
 
+                    val products by productViewModel.products.collectAsState()
+                    ProductScreen(product = products, productViewModel = productViewModel)
+                }
+
+                composable(Route.Cart.path){
+                    CartScreen(
+                    )
+                }
+            }
         }
     }
 }

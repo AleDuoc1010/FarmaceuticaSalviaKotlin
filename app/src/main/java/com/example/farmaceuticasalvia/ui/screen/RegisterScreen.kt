@@ -1,7 +1,5 @@
 package com.example.farmaceuticasalvia.ui.screen
 
-import android.R
-import android.text.Layout
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,14 +8,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,19 +29,17 @@ import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModel
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import java.nio.file.WatchEvent
 
 @Composable
 fun RegisterScreenVm(
+    vm: AuthViewModel,
     onRegisterNavigateLogin: () -> Unit,
     onGoLogin: () -> Unit
 ){
-    val vm: AuthViewModel = viewModel()
     val state by vm.register.collectAsStateWithLifecycle()
 
     if (state.success){
@@ -219,7 +219,24 @@ private fun RegisterScreen(
                 enabled = canSubmit && !isSubmitting,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                if(isSubmitting){}
+                if(isSubmitting){
+                    CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(19.dp))
+                    Spacer(Modifier.width(8.dp))
+                    Text("Creando cuenta...")
+                } else {
+                    Text("Registrar")
+                }
+            }
+
+            if (errorMsg != null) {
+                Spacer(Modifier.height(8.dp))
+                Text(errorMsg, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
+            }
+
+            Spacer(Modifier.height(12.dp))
+
+            OutlinedButton(onClick = onGoLogin, modifier = Modifier.fillMaxWidth()) {
+                Text("Ir a Login")
             }
         }
     }

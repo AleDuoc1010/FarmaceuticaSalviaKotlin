@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
 }
 
 android {
@@ -63,4 +64,17 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
     // Material icons (necesarios para Visibility / VisibilityOff)
     implementation("androidx.compose.material:material-icons-extended")
+
+    // Room (SQLite) - runtime y extensiones KTX
+    implementation("androidx.room:room-runtime:2.6.1")    // <-- NUEVO
+    implementation("androidx.room:room-ktx:2.6.1")        // <-- NUEVO
+
+    // Compilador de Room vía KSP
+    ksp("androidx.room:room-compiler:2.6.1")               // <-- NUEVO
+
+    //FileProvider para la carga de imagenes en Compose
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+    //DataStorage
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
 }
