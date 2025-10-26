@@ -2,12 +2,15 @@ package com.example.farmaceuticasalvia.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.farmaceuticasalvia.data.local.products.ProductEntity
 import com.example.farmaceuticasalvia.data.repository.ProductRepository
 import com.example.farmaceuticasalvia.domain.validation.validatePhone
 import com.example.farmaceuticasalvia.domain.validation.validateQuantity
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -21,11 +24,15 @@ data class ProductUiState(
     val phone: String = ""
 )
 class ProductViewModel(
-    private val repository: ProductRepository
+    private val repository: ProductRepository,
+    private val cartRepository: CartRepository
 ): ViewModel(){
 
     private val _products = MutableStateFlow<List<ProductEntity>>(emptyList())
     val products: StateFlow<List<ProductEntity>> = _products
+
+    private val _featuredProducts = MutableStateFlow<List<ProductEntity>>(emptyList())
+    val featuredProducts: StateFlow<List<ProductEntity>> = _featuredProducts
 
     private val _selectedProduct = MutableStateFlow<ProductEntity?>(null)
     val selectedProduct: StateFlow<ProductEntity?> = _selectedProduct.asStateFlow()
@@ -42,14 +49,26 @@ class ProductViewModel(
     private val _phoneError = MutableStateFlow<String?>(null)
     val phoneError: StateFlow<String?> = _phoneError.asStateFlow()
 
+    private val _showPurchaseNotificationEvent = MutableSharedFlow<String>()
+    val showPurchaseNotificationEvent = _showPurchaseNotificationEvent.asSharedFlow()
+
     init {
         fetchProducts()
+        fetchFeaturedProducts()
     }
 
     private fun fetchProducts(){
         viewModelScope.launch {
-            val list = repository.getAllProducts()
-            _products.value = list
+            repository.getAllProducts().collect { list ->
+                _products.value = list
+            }
+        }
+    }
+
+    private fun fetchFeaturedProducts(){
+        viewModelScope.launch {
+            repository.GetFeaturedProducts().collect { list ->
+            _featuredProducts.value = list}
         }
     }
 
@@ -98,6 +117,11 @@ class ProductViewModel(
         print("Cantidad: ${quantityInt}")
         print("Telefono: ${phoneStr}")
 
+        val productName = product?.name ?: "Producto"
+        viewModelScope.launch {
+            _showPurchaseNotificationEvent.emit(productName)
+        }
+
         onModalDismiss()
     }
 
@@ -114,9 +138,11 @@ class ProductViewModel(
         val product = _selectedProduct.value
         val quantityInt = quantityStr.toInt()
 
-        print("Añadadido al carrito")
-        print("Producto: ${product?.name}")
-        print("Cantidad: ${quantityInt}")
+        if(product != null) {
+            viewModelScope.launch {
+                cartRepository.addToCart(product, quantityInt)
+            }
+        }
 
         onModalDismiss()
     }

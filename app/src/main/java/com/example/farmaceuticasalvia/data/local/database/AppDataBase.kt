@@ -12,16 +12,20 @@ import kotlinx.coroutines.CoroutineScope                        // Para corrutin
 import kotlinx.coroutines.Dispatchers                           // Dispatcher IO
 import kotlinx.coroutines.launch
 import com.example.farmaceuticasalvia.R
+import com.example.farmaceuticasalvia.data.local.cart.CartDao
+import com.example.farmaceuticasalvia.data.local.cart.CartItemEntity
 
 @Database(
-    entities = [UserEntity::class, ProductEntity::class],
-    version = 1,
+    entities = [UserEntity::class, ProductEntity::class, CartItemEntity::class],
+    version = 2,
     exportSchema = true
 )
 abstract class AppDataBase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
     abstract fun productDao(): ProductDao
+
+    abstract fun CartDao(): CartDao
 
     companion object{
 
@@ -42,6 +46,10 @@ abstract class AppDataBase : RoomDatabase() {
                     .addCallback(object : RoomDatabase.Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
+                        }
+
+                        override fun onOpen(db: SupportSQLiteDatabase){
+                            super.onOpen(db)
 
                             CoroutineScope(Dispatchers.IO).launch {
                                 val dao = getInstance(context).userDao()
@@ -69,17 +77,45 @@ abstract class AppDataBase : RoomDatabase() {
                                 val seedProducts = listOf(
                                     ProductEntity(
                                         name = "Paracetamol",
-                                        descr = "Alivia el dolor y reduce la fiebre",
-                                        price = 1500,
+                                        descr = "Alivia el dolor y reduce la fiebre.",
+                                        price = 2990,
                                         imageRes = R.drawable.paracetamol,
                                         featured = true
                                     ),
                                     ProductEntity(
                                         name = "Ibuprofeno",
-                                        descr = "Antiinflamatorio y análgesico",
-                                        price = 1800,
+                                        descr = "Antiinflamatorio y análgesico.",
+                                        price = 3990,
                                         imageRes = R.drawable.ibuprofeno,
                                         featured = false
+                                    ),
+                                    ProductEntity(
+                                        name = "Vitamina C",
+                                        descr = "Refuerza tu sistema inmune. Frasco con 30 cápsulas.",
+                                        price = 5490,
+                                        imageRes = R.drawable.vitamina_c,
+                                        featured = true
+                                    ),
+                                    ProductEntity(
+                                        name = "Amoxicilina",
+                                        descr = "Antibiotico.",
+                                        price = 10950,
+                                        imageRes = R.drawable.amoxicilina,
+                                        featured = true
+                                    ),
+                                    ProductEntity(
+                                        name = "Omeprazol",
+                                        descr = "Alivio de la acidez estomacal. Caja de 14 cápsulas.",
+                                        price = 7990,
+                                        imageRes = R.drawable.omeprazol,
+                                        featured = true
+                                    ),
+                                    ProductEntity(
+                                        name = "Loratadina",
+                                        descr = "Alivio de alergias y síntomas nasales. Caja de 10 comprimidos.",
+                                        price = 4590,
+                                        imageRes = R.drawable.loratadina,
+                                        featured = true
                                     )
                                 )
                                 if(daoProd.count() == 0){

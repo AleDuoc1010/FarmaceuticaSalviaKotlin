@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductDao {
@@ -12,10 +13,10 @@ interface ProductDao {
     suspend fun insert(product: ProductEntity): Long
 
     @Query("SELECT * FROM products ORDER BY id ASC")
-    suspend fun getAll(): List<ProductEntity>
+    fun getAll(): Flow<List<ProductEntity>>
 
-    @Query("SELECT * FROM products WHERE featured = 1")
-    suspend fun getFeatured(): List<ProductEntity>
+    @Query("SELECT * FROM products WHERE featured = 1 ORDER BY id ASC")
+    fun getFeatured(): Flow<List<ProductEntity>>
 
     @Query("SELECT * FROM products WHERE id = :id")
     suspend fun getById(id: Long): ProductEntity?

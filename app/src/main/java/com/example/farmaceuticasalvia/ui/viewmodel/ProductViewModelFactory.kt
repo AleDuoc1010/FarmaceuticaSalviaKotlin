@@ -5,12 +5,13 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.farmaceuticasalvia.data.repository.ProductRepository
 
 class ProductViewModelFactory(
-    private val repository: ProductRepository
+    private val repository: ProductRepository,
+    private val cartRepository: CartRepository
 ): ViewModelProvider.Factory {
     @Suppress("UNCHECKED_CAST")
     override fun <T: ViewModel> create(modelClass: Class<T>): T {
         if(modelClass.isAssignableFrom(ProductViewModel::class.java)){
-            return ProductViewModel(repository) as T
+            return ProductViewModel(repository, cartRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }

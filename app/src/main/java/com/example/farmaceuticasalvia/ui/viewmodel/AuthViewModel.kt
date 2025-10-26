@@ -1,7 +1,5 @@
 package com.example.farmaceuticasalvia.ui.viewmodel
 
-import android.view.View
-import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.farmaceuticasalvia.data.repository.UserRepository

@@ -24,7 +24,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModel
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -33,6 +32,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import com.example.farmaceuticasalvia.ui.theme.Beige
 
 @Composable
 fun RegisterScreenVm(
@@ -97,15 +97,13 @@ private fun RegisterScreen(
     onSubmit: () -> Unit,                                    // Acción Registrar
     onGoLogin: () -> Unit
 ){
-    val bg = MaterialTheme.colorScheme.tertiaryContainer
-
     var showPass by remember { mutableStateOf(false) }
     var showConfirm by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(bg)
+            .background(Beige)
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ){

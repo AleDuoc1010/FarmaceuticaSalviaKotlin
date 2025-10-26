@@ -6,6 +6,7 @@ import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -23,12 +24,16 @@ import com.example.farmaceuticasalvia.ui.screen.RegisterScreenVm
 import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import com.example.farmaceuticasalvia.domain.validation.showPurchaseNotification
+import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavGraph(navController: NavHostController,
                 authViewModel: AuthViewModel,
-                productViewModel: ProductViewModel){
+                productViewModel: ProductViewModel,
+                cartViewModel: CartViewModel){
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -38,6 +43,13 @@ fun AppNavGraph(navController: NavHostController,
     val goRegister: () -> Unit = {navController.navigate(Route.Register.path)}
     val goProducts: () -> Unit = {navController.navigate(Route.Products.path)}
     val goCart: () -> Unit = {navController.navigate(Route.Cart.path)}
+
+    val context = LocalContext.current
+    LaunchedEffect(key1 = Unit) {
+        productViewModel.showPurchaseNotificationEvent.collect { productName ->
+            showPurchaseNotification(context, productName)
+        }
+    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -84,7 +96,8 @@ fun AppNavGraph(navController: NavHostController,
                 composable(Route.Home.path){
                     HomeScreen(
                         onGoLogin = goLogin,
-                        onGoRegister = goRegister
+                        onGoRegister = goRegister,
+                        productViewModel = productViewModel
                     )
                 }
 
@@ -112,6 +125,7 @@ fun AppNavGraph(navController: NavHostController,
 
                 composable(Route.Cart.path){
                     CartScreen(
+                        cartViewModel = cartViewModel
                     )
                 }
             }
