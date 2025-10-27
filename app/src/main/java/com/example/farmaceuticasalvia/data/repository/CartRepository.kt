@@ -1,12 +1,8 @@
-package com.example.farmaceuticasalvia.ui.viewmodel
+package com.example.farmaceuticasalvia.data.repository
 
 import com.example.farmaceuticasalvia.data.local.cart.CartDao
-import com.example.farmaceuticasalvia.data.local.cart.CartItem
 import com.example.farmaceuticasalvia.data.local.cart.CartItemEntity
 import com.example.farmaceuticasalvia.data.local.products.ProductEntity
-import com.example.farmaceuticasalvia.ui.screen.CartItemRow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 
 class CartRepository(
     private val cartDao: CartDao
@@ -25,5 +21,13 @@ class CartRepository(
         } else{
             cartDao.upsert(CartItemEntity(product.id, quantity))
         }
+    }
+
+    suspend fun removeFromCart(productId: Long){
+        cartDao.delete(productId)
+    }
+
+    suspend fun clearCart(){
+        cartDao.clearCart()
     }
 }

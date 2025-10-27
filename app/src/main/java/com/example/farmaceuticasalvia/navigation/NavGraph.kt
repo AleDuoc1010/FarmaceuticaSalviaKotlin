@@ -25,15 +25,19 @@ import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.farmaceuticasalvia.domain.validation.showPurchaseNotification
+import com.example.farmaceuticasalvia.ui.screen.HistoryScreen
 import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModel
+import com.example.farmaceuticasalvia.ui.viewmodel.HistoryViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun AppNavGraph(navController: NavHostController,
                 authViewModel: AuthViewModel,
                 productViewModel: ProductViewModel,
-                cartViewModel: CartViewModel){
+                cartViewModel: CartViewModel,
+                historyViewModel: HistoryViewModel){
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -43,6 +47,7 @@ fun AppNavGraph(navController: NavHostController,
     val goRegister: () -> Unit = {navController.navigate(Route.Register.path)}
     val goProducts: () -> Unit = {navController.navigate(Route.Products.path)}
     val goCart: () -> Unit = {navController.navigate(Route.Cart.path)}
+    val goHistory: () -> Unit = {navController.navigate(Route.History.path)}
 
     val context = LocalContext.current
     LaunchedEffect(key1 = Unit) {
@@ -76,6 +81,10 @@ fun AppNavGraph(navController: NavHostController,
                     onCart = {
                         scope.launch { drawerState.close() }
                         goCart()
+                    },
+                    onHistory = {
+                        scope.launch { drawerState.close() }
+                        goHistory()
                     }
                 )
             )
@@ -126,6 +135,12 @@ fun AppNavGraph(navController: NavHostController,
                 composable(Route.Cart.path){
                     CartScreen(
                         cartViewModel = cartViewModel
+                    )
+                }
+
+                composable (Route.History.path){
+                    HistoryScreen(
+                        historyViewModel = historyViewModel
                     )
                 }
             }

@@ -5,6 +5,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -39,7 +40,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.stylusHoverIcon
 import androidx.compose.ui.layout.ContentScale
@@ -60,6 +60,7 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
 import androidx.compose.foundation.lazy.items
+import androidx.compose.ui.Alignment
 import com.example.farmaceuticasalvia.data.local.storage.UserPreferences
 import com.example.farmaceuticasalvia.ui.components.BuyModal
 import com.example.farmaceuticasalvia.ui.components.CartModal
@@ -153,7 +154,7 @@ fun HomeScreen(
 
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 items(featuredProducts){producto ->
                     FeaturedProductCard(
@@ -291,20 +292,28 @@ private fun FeaturedProductCard(
             )
             Spacer(Modifier.height(12.dp))
 
-            Row (horizontalArrangement = Arrangement.spacedBy(4.dp)){
+            Column (
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ){
                 Button(
                     onClick = onBuyClick,
                     colors = ButtonDefaults.buttonColors(containerColor = Blue),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Comprar", style = MaterialTheme.typography.labelSmall)
+                    Text("Comprar")
                 }
+                Spacer(Modifier.height(6.dp))
+
                 OutlinedButton(
                     onClick = onCartClick,
-                    colors = ButtonDefaults.buttonColors(containerColor = Blue),
-                    modifier = Modifier.weight(1f)
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = Blue
+                    ),
+                    border = BorderStroke(1.dp, Blue),
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Añadir", style = MaterialTheme.typography.labelSmall)
+                    Text("Añadir")
                 }
             }
         }

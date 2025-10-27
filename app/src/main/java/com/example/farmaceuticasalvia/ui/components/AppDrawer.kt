@@ -2,6 +2,7 @@ package com.example.farmaceuticasalvia.ui.components
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Shop
@@ -49,11 +50,13 @@ fun defaultDrawerItems(
     onLogin: () -> Unit,
     onRegister: () -> Unit,
     onProducts: () -> Unit,
-    onCart: () -> Unit
+    onCart: () -> Unit,
+    onHistory: () -> Unit
 ): List<DrawerItem> = listOf(
     DrawerItem("Home", Icons.Filled.Home , onHome),
     DrawerItem("Login", Icons.Filled.AccountCircle , onLogin),
     DrawerItem("Register", Icons.Filled.Person , onRegister),
     DrawerItem("Products", Icons.Filled.Shop, onProducts),
-    DrawerItem("Cart", Icons.Filled.ShoppingCart, onCart)
+    DrawerItem("Cart", Icons.Filled.ShoppingCart, onCart),
+    DrawerItem("History", Icons.Filled.History, onHistory)
 )

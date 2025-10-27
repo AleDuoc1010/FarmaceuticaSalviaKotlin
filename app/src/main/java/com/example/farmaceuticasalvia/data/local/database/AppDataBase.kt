@@ -14,18 +14,20 @@ import kotlinx.coroutines.launch
 import com.example.farmaceuticasalvia.R
 import com.example.farmaceuticasalvia.data.local.cart.CartDao
 import com.example.farmaceuticasalvia.data.local.cart.CartItemEntity
+import com.example.farmaceuticasalvia.data.local.history.HistoryDao
+import com.example.farmaceuticasalvia.data.local.history.HistoryItemEntity
 
 @Database(
-    entities = [UserEntity::class, ProductEntity::class, CartItemEntity::class],
-    version = 2,
-    exportSchema = true
+    entities = [UserEntity::class, ProductEntity::class, CartItemEntity::class, HistoryItemEntity::class],
+    version = 3,
+    exportSchema = false
 )
 abstract class AppDataBase : RoomDatabase() {
 
     abstract fun userDao(): UserDao
     abstract fun productDao(): ProductDao
-
     abstract fun CartDao(): CartDao
+    abstract fun HistoryDao(): HistoryDao
 
     companion object{
 

@@ -2,6 +2,7 @@ package com.example.farmaceuticasalvia.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,11 +20,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModel
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.ui.Alignment
 import com.example.farmaceuticasalvia.data.local.cart.CartItem
 import com.example.farmaceuticasalvia.ui.theme.Beige
 
@@ -38,18 +44,33 @@ fun CartScreen(cartViewModel: CartViewModel){
             .background(Beige)
             .padding(16.dp)
     ){
-        Text(
-            "Carrito",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
+
+        Row (
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Text(
+                "Carrito",
+                style = MaterialTheme.typography.headlineMedium
+            )
+
+            if (cartItems.isNotEmpty()) {
+                OutlinedButton(onClick = {cartViewModel.clearCart()}) {
+                    Text("Vaciar Carrito")
+                }
+            }
+        }
+        Spacer(Modifier.height(16.dp))
 
         if (cartItems.isEmpty()){
             Text("Tu carrito está vacío.")
         } else{
             LazyColumn (modifier = Modifier.fillMaxWidth()){
                 items(cartItems){item ->
-                    CartItemRow(item = item)
+                    CartItemRow(
+                        item = item,
+                        onDelete = {cartViewModel.removeFromCart(item.product.id)})
                     Spacer(Modifier.height(8.dp))
                 }
             }
@@ -57,7 +78,7 @@ fun CartScreen(cartViewModel: CartViewModel){
     }
 }
 @Composable
-fun CartItemRow(item: CartItem){
+fun CartItemRow(item: CartItem, onDelete: () -> Unit){
     Card(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -76,6 +97,10 @@ fun CartItemRow(item: CartItem){
                 Text("Precio $${item.product.price}")
             }
             Text("x ${item.quantity}", style = MaterialTheme.typography.titleLarge)
+
+            IconButton(onClick = onDelete) {
+                Icon(Icons.Filled.Delete, contentDescription = "Eliminar producto")
+            }
         }
     }
 

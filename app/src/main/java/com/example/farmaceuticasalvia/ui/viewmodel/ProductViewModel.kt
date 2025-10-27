@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.farmaceuticasalvia.data.local.products.ProductEntity
+import com.example.farmaceuticasalvia.data.repository.CartRepository
+import com.example.farmaceuticasalvia.data.repository.HistoryRepository
 import com.example.farmaceuticasalvia.data.repository.ProductRepository
 import com.example.farmaceuticasalvia.domain.validation.validatePhone
 import com.example.farmaceuticasalvia.domain.validation.validateQuantity
@@ -25,7 +27,8 @@ data class ProductUiState(
 )
 class ProductViewModel(
     private val repository: ProductRepository,
-    private val cartRepository: CartRepository
+    private val cartRepository: CartRepository,
+    private val historyRepository: HistoryRepository
 ): ViewModel(){
 
     private val _products = MutableStateFlow<List<ProductEntity>>(emptyList())
@@ -112,10 +115,11 @@ class ProductViewModel(
         val product = _selectedProduct.value
         val quantityInt = quantityStr.toInt()
 
-        print("Compra Exitosa")
-        print("Producto: ${product?.name}")
-        print("Cantidad: ${quantityInt}")
-        print("Telefono: ${phoneStr}")
+        if(product != null){
+            viewModelScope.launch {
+                historyRepository.addToHistory(product, quantityInt, phoneStr)
+            }
+        }
 
         val productName = product?.name ?: "Producto"
         viewModelScope.launch {

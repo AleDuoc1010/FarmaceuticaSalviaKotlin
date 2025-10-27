@@ -2,6 +2,7 @@ package com.example.farmaceuticasalvia.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.farmaceuticasalvia.data.repository.CartRepository
 
 class CartViewModelFactory(
     private val cartRepository: CartRepository

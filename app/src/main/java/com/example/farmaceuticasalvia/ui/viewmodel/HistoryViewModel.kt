@@ -2,33 +2,33 @@ package com.example.farmaceuticasalvia.ui.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.farmaceuticasalvia.data.local.cart.CartItem
-import com.example.farmaceuticasalvia.data.repository.CartRepository
+import com.example.farmaceuticasalvia.data.local.history.PurchaseRecord
+import com.example.farmaceuticasalvia.data.repository.HistoryRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class CartViewModel(
-    private val cartRepository: CartRepository
-): ViewModel(){
-    val cartItems: StateFlow<List<CartItem>> = cartRepository.cartItems
+class HistoryViewModel(
+    private val historyRepository: HistoryRepository
+): ViewModel() {
+
+    val history: StateFlow<List<PurchaseRecord>> = historyRepository.purchaseHistory
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000L),
             initialValue = emptyList()
         )
 
-    fun removeFromCart(productId: Long) {
+    fun removeFromHistory(historyItemId: Long) {
         viewModelScope.launch {
-            cartRepository.removeFromCart(productId)
+            historyRepository.removeFromHistory(historyItemId)
         }
     }
 
-    fun clearCart(){
+    fun clearHistory(){
         viewModelScope.launch {
-            cartRepository.clearCart()
+            historyRepository.clearHistory()
         }
     }
 }
-

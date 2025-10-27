@@ -19,14 +19,17 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.farmaceuticasalvia.data.local.database.AppDataBase
+import com.example.farmaceuticasalvia.data.repository.HistoryRepository
 import com.example.farmaceuticasalvia.data.repository.ProductRepository
 import com.example.farmaceuticasalvia.data.repository.UserRepository
 import com.example.farmaceuticasalvia.navigation.AppNavGraph
 import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModelFactory
-import com.example.farmaceuticasalvia.ui.viewmodel.CartRepository
+import com.example.farmaceuticasalvia.data.repository.CartRepository
 import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModelFactory
+import com.example.farmaceuticasalvia.ui.viewmodel.HistoryViewModel
+import com.example.farmaceuticasalvia.ui.viewmodel.HistoryViewModelFactory
 import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModelFactory
 
@@ -73,21 +76,27 @@ fun AppRoot() {
     val userDao = db.userDao()
     val productDao = db.productDao()
     val cartDao = db.CartDao()
+    val historyDao = db.HistoryDao()
 
     val userRepository = UserRepository(userDao)
     val productRepository = ProductRepository(productDao)
     val cartRepository = CartRepository(cartDao)
+    val historyRepository = HistoryRepository(historyDao)
 
     val authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(userRepository)
     )
 
     val productViewModel: ProductViewModel = viewModel(
-        factory = ProductViewModelFactory(productRepository, cartRepository)
+        factory = ProductViewModelFactory(productRepository, cartRepository, historyRepository)
     )
 
     val cartViewModel: CartViewModel = viewModel(
         factory = CartViewModelFactory(cartRepository)
+    )
+
+    val historyViewModel: HistoryViewModel = viewModel(
+        factory = HistoryViewModelFactory(historyRepository)
     )
 
     val navController = rememberNavController()
@@ -98,7 +107,8 @@ fun AppRoot() {
                 navController = navController,
                 authViewModel = authViewModel,
                 productViewModel = productViewModel,
-                cartViewModel = cartViewModel
+                cartViewModel = cartViewModel,
+                historyViewModel = historyViewModel
             )
         }
     }
