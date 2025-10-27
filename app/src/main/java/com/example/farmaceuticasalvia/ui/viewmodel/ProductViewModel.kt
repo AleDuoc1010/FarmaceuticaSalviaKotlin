@@ -23,7 +23,8 @@ enum class ActiveModal{
 
 data class ProductUiState(
     val quantity: String = "1",
-    val phone: String = ""
+    val phone: String = "",
+    val photoUriString: String? = null
 )
 class ProductViewModel(
     private val repository: ProductRepository,
@@ -33,6 +34,9 @@ class ProductViewModel(
 
     private val _products = MutableStateFlow<List<ProductEntity>>(emptyList())
     val products: StateFlow<List<ProductEntity>> = _products
+
+    private val _recipeError = MutableStateFlow<String?>(null)
+    val recipeError: StateFlow<String?> = _recipeError.asStateFlow()
 
     private val _featuredProducts = MutableStateFlow<List<ProductEntity>>(emptyList())
     val featuredProducts: StateFlow<List<ProductEntity>> = _featuredProducts
@@ -86,6 +90,7 @@ class ProductViewModel(
         _modalUiState.value = ProductUiState()
         _quantityError.value = null
         _phoneError.value = null
+        _recipeError.value = null
     }
 
     fun onQuantityChanged(quantity: String){
@@ -108,17 +113,26 @@ class ProductViewModel(
         _quantityError.value = quantityError
         _phoneError.value = phoneError
 
-        if(quantityError != null || phoneError != null){
-            return
-        }
+
 
         val product = _selectedProduct.value
+        val state = _modalUiState.value
         val quantityInt = quantityStr.toInt()
 
         if(product != null){
             viewModelScope.launch {
                 historyRepository.addToHistory(product, quantityInt, phoneStr)
             }
+        }
+
+        var recipeError : String? = null
+        if (product != null && product.requireRecipe && state.photoUriString == null){
+            recipeError = "Este producto requiere una foto de la receta"
+        }
+        _recipeError.value = recipeError
+
+        if(quantityError != null || phoneError != null || recipeError != null){
+            return
         }
 
         val productName = product?.name ?: "Producto"
@@ -149,5 +163,14 @@ class ProductViewModel(
         }
 
         onModalDismiss()
+    }
+
+    fun onPhotoTaken(uri: String) {
+        _modalUiState.update { it.copy(photoUriString = uri) }
+        _recipeError.value = null
+    }
+
+    fun onDeletePhoto(){
+        _modalUiState.update { it.copy(photoUriString = null) }
     }
 }

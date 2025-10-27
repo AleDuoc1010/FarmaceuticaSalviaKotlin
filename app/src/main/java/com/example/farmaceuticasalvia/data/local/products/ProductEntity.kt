@@ -12,6 +12,7 @@ data class ProductEntity (
     val descr: String,
     val price: Int,
     val imageRes: Int,
-    val featured: Boolean
+    val featured: Boolean,
+    val requireRecipe: Boolean = false
 ){
 }

@@ -82,42 +82,49 @@ abstract class AppDataBase : RoomDatabase() {
                                         descr = "Alivia el dolor y reduce la fiebre.",
                                         price = 2990,
                                         imageRes = R.drawable.paracetamol,
-                                        featured = true
+                                        featured = true,
+                                        requireRecipe = false
+
                                     ),
                                     ProductEntity(
                                         name = "Ibuprofeno",
                                         descr = "Antiinflamatorio y análgesico.",
                                         price = 3990,
                                         imageRes = R.drawable.ibuprofeno,
-                                        featured = false
+                                        featured = false,
+                                        requireRecipe = false
                                     ),
                                     ProductEntity(
                                         name = "Vitamina C",
                                         descr = "Refuerza tu sistema inmune. Frasco con 30 cápsulas.",
                                         price = 5490,
                                         imageRes = R.drawable.vitamina_c,
-                                        featured = true
+                                        featured = true,
+                                        requireRecipe = false
                                     ),
                                     ProductEntity(
                                         name = "Amoxicilina",
                                         descr = "Antibiotico.",
                                         price = 10950,
                                         imageRes = R.drawable.amoxicilina,
-                                        featured = true
+                                        featured = true,
+                                        requireRecipe = true
                                     ),
                                     ProductEntity(
                                         name = "Omeprazol",
                                         descr = "Alivio de la acidez estomacal. Caja de 14 cápsulas.",
                                         price = 7990,
                                         imageRes = R.drawable.omeprazol,
-                                        featured = true
+                                        featured = true,
+                                        requireRecipe = true
                                     ),
                                     ProductEntity(
                                         name = "Loratadina",
                                         descr = "Alivio de alergias y síntomas nasales. Caja de 10 comprimidos.",
                                         price = 4590,
                                         imageRes = R.drawable.loratadina,
-                                        featured = true
+                                        featured = true,
+                                        requireRecipe = false
                                     )
                                 )
                                 if(daoProd.count() == 0){
