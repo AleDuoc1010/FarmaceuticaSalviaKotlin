@@ -106,33 +106,31 @@ class ProductViewModel(
     fun onConfirmBuy(){
         val quantityStr = _modalUiState.value.quantity
         val phoneStr = _modalUiState.value.phone
+        val state = _modalUiState.value
+        val product = _selectedProduct.value
 
         val quantityError = validateQuantity(quantityStr)
         val phoneError = validatePhone(phoneStr)
 
+        var recipeError : String? = null
+        if (product != null && product.requireRecipe && state.photoUriString == null){
+            recipeError = "Este producto requiere una foto de la receta"
+        }
+
         _quantityError.value = quantityError
         _phoneError.value = phoneError
+        _recipeError.value = recipeError
 
+        if(quantityError != null || phoneError != null || recipeError != null){
+            return
+        }
 
-
-        val product = _selectedProduct.value
-        val state = _modalUiState.value
         val quantityInt = quantityStr.toInt()
 
         if(product != null){
             viewModelScope.launch {
                 historyRepository.addToHistory(product, quantityInt, phoneStr)
             }
-        }
-
-        var recipeError : String? = null
-        if (product != null && product.requireRecipe && state.photoUriString == null){
-            recipeError = "Este producto requiere una foto de la receta"
-        }
-        _recipeError.value = recipeError
-
-        if(quantityError != null || phoneError != null || recipeError != null){
-            return
         }
 
         val productName = product?.name ?: "Producto"

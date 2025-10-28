@@ -191,11 +191,11 @@ private fun CameraSection(
 
         Row (horizontalArrangement = Arrangement.spacedBy(8.dp)){
             Button(onClick = onTakePhoto) {
-                Text(if (photoUriString == null ) "Tomar foto " else "Tomar nuevamente")
+                Text(if (photoUriString == null ) "Tomar foto " else "Tomar denuevo")
             }
             if(!photoUriString.isNullOrEmpty()){
                 OutlinedButton(onClick = onDeletePhoto) {
-                    Text("Eliminar")
+                    Text("Borrar")
                 }
             }
         }

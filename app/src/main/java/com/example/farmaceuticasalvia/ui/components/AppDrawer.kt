@@ -53,10 +53,10 @@ fun defaultDrawerItems(
     onCart: () -> Unit,
     onHistory: () -> Unit
 ): List<DrawerItem> = listOf(
-    DrawerItem("Home", Icons.Filled.Home , onHome),
-    DrawerItem("Login", Icons.Filled.AccountCircle , onLogin),
-    DrawerItem("Register", Icons.Filled.Person , onRegister),
-    DrawerItem("Products", Icons.Filled.Shop, onProducts),
-    DrawerItem("Cart", Icons.Filled.ShoppingCart, onCart),
-    DrawerItem("History", Icons.Filled.History, onHistory)
+    DrawerItem("Inicio", Icons.Filled.Home , onHome),
+    DrawerItem("Iniciar Sesion", Icons.Filled.AccountCircle , onLogin),
+    DrawerItem("Registrarse", Icons.Filled.Person , onRegister),
+    DrawerItem("Productos", Icons.Filled.Shop, onProducts),
+    DrawerItem("Carrito", Icons.Filled.ShoppingCart, onCart),
+    DrawerItem("Historial", Icons.Filled.History, onHistory)
 )

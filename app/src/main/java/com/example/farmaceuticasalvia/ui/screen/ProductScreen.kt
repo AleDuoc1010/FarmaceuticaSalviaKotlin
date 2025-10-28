@@ -44,6 +44,7 @@ fun ProductScreen(
             .background(Beige)) {
 
         item {
+            Spacer(Modifier.height(40.dp))
             Text("Productos", style = MaterialTheme.typography.titleLarge)
             Spacer(Modifier.height(50.dp))
         }

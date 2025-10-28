@@ -53,8 +53,6 @@ import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
 
 @Composable
 fun HomeScreen(
-    onGoLogin: () -> Unit,
-    onGoRegister: () -> Unit,
     productViewModel: ProductViewModel
 ){
     val context = LocalContext.current
@@ -93,10 +91,6 @@ fun HomeScreen(
                     tint = if(isLoggedIn) MaterialTheme.colorScheme.primary else
                     MaterialTheme.colorScheme.outline
                 )
-                AssistChip(
-                    onClick = onGoLogin,
-                    label = {Text("Navega")}
-                )
             }
 
             Spacer(Modifier.width(20.dp))
@@ -125,13 +119,6 @@ fun HomeScreen(
             Spacer(Modifier.height(20.dp))
 
 
-
-            Row (
-                horizontalArrangement = Arrangement.spacedBy(10.dp)
-            ){
-                Button(onClick = onGoLogin) { Text("ir a login")}
-                OutlinedButton(onClick = onGoRegister) { Text("ir a register") }
-            }
         }
     }
     if(selectedProduct != null && activeModal == ActiveModal.BUY) {

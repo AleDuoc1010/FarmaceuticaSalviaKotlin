@@ -104,8 +104,6 @@ fun AppNavGraph(navController: NavHostController,
             ){
                 composable(Route.Home.path){
                     HomeScreen(
-                        onGoLogin = goLogin,
-                        onGoRegister = goRegister,
                         productViewModel = productViewModel
                     )
                 }
