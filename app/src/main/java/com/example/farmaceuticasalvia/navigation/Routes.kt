@@ -10,4 +10,6 @@ sealed class Route(val path: String) {
     data object Cart : Route("Cart")
 
     data object History : Route("History")
+
+    data object Users : Route("Users")
 }

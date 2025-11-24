@@ -16,9 +16,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.example.farmaceuticasalvia.data.local.database.AppDataBase
+import com.example.farmaceuticasalvia.data.local.storage.UserPreferences
+import com.example.farmaceuticasalvia.data.remote.api.RetrofitClient
 import com.example.farmaceuticasalvia.data.repository.HistoryRepository
 import com.example.farmaceuticasalvia.data.repository.ProductRepository
 import com.example.farmaceuticasalvia.data.repository.UserRepository
@@ -26,6 +28,8 @@ import com.example.farmaceuticasalvia.navigation.AppNavGraph
 import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModelFactory
 import com.example.farmaceuticasalvia.data.repository.CartRepository
+import com.example.farmaceuticasalvia.ui.viewmodel.AdminUsersViewModel
+import com.example.farmaceuticasalvia.ui.viewmodel.AdminUsersViewModelFactory
 import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModelFactory
 import com.example.farmaceuticasalvia.ui.viewmodel.HistoryViewModel
@@ -35,6 +39,7 @@ import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -65,38 +70,42 @@ fun AppRoot() {
                 context, Manifest.permission.POST_NOTIFICATIONS
             ) != PackageManager.PERMISSION_GRANTED
             ) {
-                Log.d("PermissionRequest", "Solicitud permisd de notificación...")
+                Log.d("PermissionRequest", "Solicitud permiso de notificación...")
                 requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         }
     }
 
-    val db = AppDataBase.getInstance(context)
+    val userPreferences = UserPreferences(context)
 
-    val userDao = db.userDao()
-    val productDao = db.productDao()
-    val cartDao = db.CartDao()
-    val historyDao = db.HistoryDao()
+    val usuarioApi = RetrofitClient.getUsuariosApi(context)
+    val catalogoApi = RetrofitClient.getCatalogoApi(context)
+    val pedidosApi = RetrofitClient.getPedidosApi(context)
 
-    val userRepository = UserRepository(userDao)
-    val productRepository = ProductRepository(productDao)
-    val cartRepository = CartRepository(cartDao)
-    val historyRepository = HistoryRepository(historyDao)
+    val userRepository = UserRepository(usuarioApi, userPreferences)
+    val productRepository = ProductRepository(catalogoApi)
+    val cartRepository = CartRepository(pedidosApi)
+    val historyRepository = HistoryRepository(pedidosApi)
+
 
     val authViewModel: AuthViewModel = viewModel(
         factory = AuthViewModelFactory(userRepository)
     )
 
     val productViewModel: ProductViewModel = viewModel(
-        factory = ProductViewModelFactory(productRepository, cartRepository, historyRepository)
+        factory = ProductViewModelFactory(productRepository, cartRepository)
     )
 
     val cartViewModel: CartViewModel = viewModel(
-        factory = CartViewModelFactory(cartRepository)
+        factory = CartViewModelFactory(cartRepository, productRepository)
     )
 
     val historyViewModel: HistoryViewModel = viewModel(
-        factory = HistoryViewModelFactory(historyRepository)
+        factory = HistoryViewModelFactory(historyRepository, productRepository)
+    )
+
+    val adminUsersViewModel: AdminUsersViewModel = viewModel(
+        factory = AdminUsersViewModelFactory(userRepository, userPreferences)
     )
 
     val navController = rememberNavController()
@@ -108,7 +117,9 @@ fun AppRoot() {
                 authViewModel = authViewModel,
                 productViewModel = productViewModel,
                 cartViewModel = cartViewModel,
-                historyViewModel = historyViewModel
+                historyViewModel = historyViewModel,
+                adminUsersViewModel = adminUsersViewModel,
+                userPreferences = userPreferences
             )
         }
     }

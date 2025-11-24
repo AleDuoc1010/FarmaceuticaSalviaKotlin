@@ -1,6 +1,6 @@
 package com.example.farmaceuticasalvia.ui.screen
 
-import androidx.compose.foundation.Image
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,78 +27,138 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.style.TextAlign
-import com.example.farmaceuticasalvia.data.local.cart.CartItem
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.farmaceuticasalvia.ui.theme.Beige
+import com.example.farmaceuticasalvia.ui.theme.Blue
+import com.example.farmaceuticasalvia.ui.viewmodel.CartItemUi
+import com.example.farmaceuticasalvia.R
+import com.example.farmaceuticasalvia.data.utils.fixImageUrl
 
 @Composable
 
 fun CartScreen(cartViewModel: CartViewModel){
 
 
+    val state by cartViewModel.uiState.collectAsState()
+    val context = LocalContext.current
+    LaunchedEffect(Unit) {
+        cartViewModel.loadCart()
+    }
 
-    val cartItems by cartViewModel.cartItems.collectAsState()
+    LaunchedEffect(state.checkoutSuccess) {
+        if (state.checkoutSuccess) {
+            Toast.makeText(context, "Se ha agregado el producto", Toast.LENGTH_LONG).show()
+            cartViewModel.onCheckoutSuccessHandled()
+            cartViewModel.loadCart()
+        }
+    }
 
+    LaunchedEffect(state.errorMsg) {
+        if (state.errorMsg != null) {
+            Toast.makeText(context, state.errorMsg, Toast.LENGTH_SHORT).show()
+        }
+    }
 
+    Box(modifier = Modifier.fillMaxSize().background(Beige)) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(16.dp)
+        ) {
+            // --- ENCABEZADO ---
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    "Carrito de Compras",
+                    style = MaterialTheme.typography.headlineMedium
+                )
 
-    Column (
-
-        modifier = Modifier
-
-            .fillMaxSize()
-
-            .background(Beige)
-
-            .padding(16.dp)
-
-    ){
-
-
-
-        Row (
-
-            modifier = Modifier.fillMaxWidth(),
-
-            horizontalArrangement = Arrangement.SpaceBetween,
-
-            verticalAlignment = Alignment.CenterVertically
-
-        ){
-
-            Text(
-
-                "Carrito",
-                style = MaterialTheme.typography.headlineMedium
-            )
-
-
-
-            if (cartItems.isNotEmpty()) {
-                OutlinedButton(onClick = {cartViewModel.clearCart()}) {
-                    Text("Vaciar Carrito")
+                if (state.items.isNotEmpty()) {
+                    OutlinedButton(
+                        onClick = { cartViewModel.clearCart() },
+                        enabled = !state.isLoading
+                    ) {
+                        Text("Vaciar")
+                    }
                 }
-
             }
 
-        }
-        Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(16.dp))
 
 
+            if (state.items.isEmpty()) {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text(
+                        text = "Tu carrito está vacío.",
+                        style = MaterialTheme.typography.bodyLarge
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    items(state.items) { item ->
+                        CartItemRow(
+                            item = item,
+                            onDelete = { cartViewModel.removeFromCart(item.sku) },
+                            enabled = !state.isLoading
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
 
-        if (cartItems.isEmpty()){
-            Text("Tu carrito está vacío.")
-        } else{
+                Spacer(Modifier.height(16.dp))
+                Divider()
+                Spacer(Modifier.height(16.dp))
 
-            LazyColumn (modifier = Modifier.fillMaxWidth()){
-                items(cartItems){item ->
-                    CartItemRow(
-                        item = item,
-                        onDelete = {cartViewModel.removeFromCart(item.product.id)})
-                    Spacer(Modifier.height(8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column {
+                        Text("Total:", style = MaterialTheme.typography.titleMedium)
+                        Text(
+                            "$${state.total.toInt()}",
+                            style = MaterialTheme.typography.headlineSmall,
+                            fontWeight = FontWeight.Bold,
+                            color = Blue
+                        )
+                    }
+
+                    Button(
+                        onClick = { cartViewModel.checkout() },
+                        enabled = !state.isLoading,
+                        colors = ButtonDefaults.buttonColors(containerColor = Blue),
+                        modifier = Modifier.height(50.dp)
+                    ) {
+                        if (state.isLoading) {
+                            CircularProgressIndicator(
+                                color = Color.White,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        } else {
+                            Text("Pagar Ahora", style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
                 }
             }
         }
@@ -106,31 +166,71 @@ fun CartScreen(cartViewModel: CartViewModel){
 }
 
 
-
 @Composable
-fun CartItemRow(item: CartItem, onDelete: () -> Unit){
+fun CartItemRow(
+    item: CartItemUi,
+    onDelete: () -> Unit,
+    enabled: Boolean
+) {
     Card(
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        colors = CardDefaults.cardColors(containerColor = Color.White)
     ) {
-
-        Row (
+        Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(8.dp)
-        ){
-            Image(
-                painter = painterResource(id = item.product.imageRes),
-                contentDescription = item.product.name,
-                modifier = Modifier.size(60.dp)
+            modifier = Modifier.padding(12.dp)
+        ) {
+            // Imagen Remota
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(fixImageUrl(LocalContext.current,item.imageUrl))
+                    .crossfade(true)
+                    .build(),
+                placeholder = painterResource(R.drawable.ic_launcher_foreground),
+                error = painterResource(R.drawable.ic_launcher_foreground),
+                contentDescription = item.name,
+                modifier = Modifier.size(70.dp),
+                contentScale = ContentScale.Fit
             )
+
             Spacer(Modifier.width(16.dp))
 
-            Column (modifier = Modifier.weight(1f)){
-                Text(item.product.name, style = MaterialTheme.typography.titleMedium)
-                Text("Precio $${item.product.price}")
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = item.name,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1
+                )
+                Text(
+                    text = "Precio: $${item.price.toInt()}",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.Gray
+                )
+                Text(
+                    text = "Subtotal: $${item.subtotal.toInt()}",
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold
+                )
             }
-            Text("x ${item.quantity}", style = MaterialTheme.typography.titleLarge)
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Filled.Delete, contentDescription = "Eliminar producto")
+
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = "x${item.quantity}",
+                    style = MaterialTheme.typography.headlineSmall,
+                    fontWeight = FontWeight.Bold
+                )
+
+                IconButton(
+                    onClick = onDelete,
+                    enabled = enabled
+                ) {
+                    Icon(
+                        Icons.Filled.Delete,
+                        contentDescription = "Eliminar",
+                        tint = MaterialTheme.colorScheme.error
+                    )
+                }
             }
         }
     }

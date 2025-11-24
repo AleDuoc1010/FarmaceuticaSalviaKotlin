@@ -1,5 +1,6 @@
 package com.example.farmaceuticasalvia.ui.screen
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
@@ -19,8 +20,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
@@ -37,12 +40,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.example.farmaceuticasalvia.data.local.storage.UserPreferences
+import com.example.farmaceuticasalvia.data.local.storage.IpStorage
 import com.example.farmaceuticasalvia.ui.theme.Beige
 
 @Composable
@@ -53,14 +57,10 @@ fun LoginScreenVm(
 ){
     val state by vm.login.collectAsStateWithLifecycle()
 
-    val context = LocalContext.current
-    val userPrefs = remember { UserPreferences(context) }
-
     LaunchedEffect(state.success) {
         if (state.success) {
-            userPrefs.setLoggedIn(true)
-            vm.clearLoginResult()
             onLoginOkNavigateHome()
+            vm.clearLoginResult()
         }
     }
 
@@ -84,7 +84,7 @@ fun LoginScreenVm(
 
 }
 @Composable
-private fun LoginScreen(
+fun LoginScreen(
     email: String,                                           // Campo email
     pass: String,                                            // Campo contraseña
     emailError: String?,                                     // Error de email
@@ -101,6 +101,11 @@ private fun LoginScreen(
 
     var showPass by remember { mutableStateOf(false) }
 
+    var showIpDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    val ipStorage = remember { IpStorage(context) }
+    var currentIp by remember { mutableStateOf(ipStorage.getBaseIp()) }
+
     val buttonAlpha by animateFloatAsState(
         targetValue = if (isSubmitting) 0.6f else 1f,
         label = "alphaLoginButton"
@@ -113,6 +118,17 @@ private fun LoginScreen(
             .padding(16.dp),
         contentAlignment = Alignment.Center
     ) {
+
+        Box(modifier = Modifier.fillMaxSize().padding(top = 24.dp, end = 8.dp), contentAlignment = Alignment.TopEnd) {
+            IconButton(onClick = { showIpDialog = true }) {
+                Icon(
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Configurar IP",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+
         Column(
 
             modifier = Modifier.fillMaxWidth()
@@ -120,15 +136,11 @@ private fun LoginScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Login",
+                text = "Inicio de Sesión",
                 style = MaterialTheme.typography.headlineSmall
             )
             Spacer(Modifier.height(12.dp))
 
-            Text(
-                text = "Pantalla de login",
-                textAlign = TextAlign.Center
-            )
             Spacer(Modifier.height(20.dp))
 
             OutlinedTextField(
@@ -140,7 +152,7 @@ private fun LoginScreen(
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Email
                 ),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth().testTag("emailInput")
             )
 
             AnimatedVisibility(
@@ -175,13 +187,20 @@ private fun LoginScreen(
                 isError = passError != null,
                 modifier = Modifier.fillMaxWidth()
             )
-            if (passError != null) {
-                Text(
-                    passError,
-                    color = MaterialTheme.colorScheme.error,
-                    style = MaterialTheme.typography.labelSmall)
+            AnimatedVisibility(
+                visible = passError != null,
+                enter = fadeIn() + expandVertically(),
+                exit = fadeOut() + shrinkVertically()
+            ) {
+                if (passError != null) {
+                    Text(
+                        passError,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelSmall,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
                 }
-
+            }
                 Spacer(Modifier.height(16.dp))
 
                 Button(
@@ -202,9 +221,15 @@ private fun LoginScreen(
                     }
                 }
 
-                if (errorMsg != null) {
-                    Spacer(Modifier.height(8.dp))
-                    Text(errorMsg, color = MaterialTheme.colorScheme.error)
+                AnimatedVisibility(visible = errorMsg != null) {
+                    if (errorMsg != null) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = errorMsg,
+                            color = MaterialTheme.colorScheme.error,
+                            textAlign = TextAlign.Center
+                        )
+                    }
                 }
 
                 Spacer(Modifier.height(12.dp))
@@ -212,6 +237,38 @@ private fun LoginScreen(
                 OutlinedButton(onClick = onGoRegister, modifier = Modifier.fillMaxWidth()) {
                     Text("Crear Cuenta")
                 }
+            }
+            if (showIpDialog) {
+                AlertDialog(
+                    onDismissRequest = { showIpDialog = false },
+                    title = { Text("Configurar IP del Servidor") },
+                    text = {
+                        Column {
+                            Text("Ingresa la IP de tu computador (ej: 192.168.1.5)")
+                            Spacer(Modifier.height(8.dp))
+                            OutlinedTextField(
+                                value = currentIp,
+                                onValueChange = { currentIp = it },
+                                label = { Text("Dirección IP") },
+                                singleLine = true
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text("Nota: Debes reiniciar la app para aplicar cambios.", style = MaterialTheme.typography.labelSmall)
+                        }
+                    },
+                    confirmButton = {
+                        Button(onClick = {
+                            ipStorage.saveBaseIp(currentIp)
+                            showIpDialog = false
+                            Toast.makeText(context, "IP Guardada. Reinicia la App.", Toast.LENGTH_LONG).show()
+                        }) {
+                            Text("Guardar")
+                        }
+                    },
+                    dismissButton = {
+                        Button(onClick = { showIpDialog = false }) { Text("Cancelar") }
+                    }
+                )
             }
         }
     }

@@ -23,7 +23,7 @@ fun validatePhone(phone: String): String? {
 
 fun validatePassword(pass: String): String? {
     if (pass.isBlank()) return "La contraseña es obligatoria"
-    if (pass.length < 8) return "La contraseña debe tener un minimo de 8 caracteres"
+    if (pass.length < 6) return "La contraseña debe tener un minimo de 6 caracteres"
     if (!pass.any{it.isUpperCase()}) return "La contraseña debe tener mayusculas"
     if (!pass.any{it.isLowerCase()}) return "La contraseña debe tener minusculas"
     if (!pass.any{it.isDigit()}) return "Debe incluir numeros"

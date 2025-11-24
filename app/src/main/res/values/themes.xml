@@ -2,4 +2,14 @@
 <resources>
 
     <style name="Theme.FarmaceuticaSalvia" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name= "Theme.FarmaceuticaSalvia.Splash" parent="Theme.SplashScreen">
+
+        <item name="windowSplashScreenBackground">@android:color/white</item>
+
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+
+        <item name="postSplashScreenTheme">@style/Theme.FarmaceuticaSalvia</item>
+    </style>
+
 </resources>

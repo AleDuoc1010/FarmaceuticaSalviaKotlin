@@ -25,11 +25,14 @@ import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.farmaceuticasalvia.domain.validation.showPurchaseNotification
+import com.example.farmaceuticasalvia.ui.screen.AdminUsersScreen
 import com.example.farmaceuticasalvia.ui.screen.HistoryScreen
+import com.example.farmaceuticasalvia.ui.viewmodel.AdminUsersViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.HistoryViewModel
+import com.example.farmaceuticasalvia.data.local.storage.UserPreferences
 import kotlinx.coroutines.launch
 
 @Composable
@@ -37,10 +40,16 @@ fun AppNavGraph(navController: NavHostController,
                 authViewModel: AuthViewModel,
                 productViewModel: ProductViewModel,
                 cartViewModel: CartViewModel,
-                historyViewModel: HistoryViewModel){
+                historyViewModel: HistoryViewModel,
+                adminUsersViewModel: AdminUsersViewModel,
+                userPreferences: UserPreferences){
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    val isLoggedIn by userPreferences.isLoggedIn.collectAsStateWithLifecycle(initialValue = false)
+    val userRole by userPreferences.userRole.collectAsStateWithLifecycle(initialValue = "")
+    val isAdmin = userRole == "ADMINISTRADOR"
 
     val goHome: () -> Unit  = {navController.navigate(Route.Home.path)}
     val goLogin: () -> Unit = {navController.navigate(Route.Login.path)}
@@ -48,11 +57,22 @@ fun AppNavGraph(navController: NavHostController,
     val goProducts: () -> Unit = {navController.navigate(Route.Products.path)}
     val goCart: () -> Unit = {navController.navigate(Route.Cart.path)}
     val goHistory: () -> Unit = {navController.navigate(Route.History.path)}
+    val goUsers: () -> Unit = {navController.navigate(Route.Users.path)}
 
     val context = LocalContext.current
     LaunchedEffect(key1 = Unit) {
         productViewModel.showPurchaseNotificationEvent.collect { productName ->
             showPurchaseNotification(context, productName)
+        }
+    }
+
+    val handleLogout = {
+        scope.launch {
+            userPreferences.clearSession()
+            drawerState.close()
+            navController.navigate(Route.Login.path) {
+                popUpTo(0)
+            }
         }
     }
 
@@ -85,8 +105,16 @@ fun AppNavGraph(navController: NavHostController,
                     onHistory = {
                         scope.launch { drawerState.close() }
                         goHistory()
-                    }
-                )
+                    },
+                    onUsers = {
+                        scope.launch { drawerState.close() }
+                        goUsers()
+                    },
+                    isAdmin = isAdmin,
+                    isLoggedIn = isLoggedIn
+                ),
+                isLoggedIn = isLoggedIn,
+                onLogout = { handleLogout() }
             )
         }
     ) {
@@ -139,6 +167,12 @@ fun AppNavGraph(navController: NavHostController,
                 composable (Route.History.path){
                     HistoryScreen(
                         historyViewModel = historyViewModel
+                    )
+                }
+
+                composable(Route.Users.path) {
+                    AdminUsersScreen(
+                        viewModel = adminUsersViewModel
                     )
                 }
             }

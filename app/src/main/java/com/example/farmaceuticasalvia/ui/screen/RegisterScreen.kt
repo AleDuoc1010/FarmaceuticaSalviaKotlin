@@ -1,5 +1,6 @@
 package com.example.farmaceuticasalvia.ui.screen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,9 +43,11 @@ fun RegisterScreenVm(
 ){
     val state by vm.register.collectAsStateWithLifecycle()
 
-    if (state.success){
-        vm.clearRegisterResult()
-        onRegisterNavigateLogin()
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            onRegisterNavigateLogin()
+            vm.clearRegisterResult()
+        }
     }
 
     RegisterScreen(
@@ -200,14 +203,14 @@ private fun RegisterScreen(
                     IconButton(onClick = {showConfirm = !showConfirm}) {
                         Icon(
                             imageVector = if(showConfirm) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                            contentDescription = if (showConfirm) "Ocultar congirmacion" else "Mostrar confirmacion"
+                            contentDescription = if (showConfirm) "Ocultar confirmacion" else "Mostrar confirmacion"
                         )
                     }
                 },
                 modifier = Modifier.fillMaxWidth()
             )
-            if (confirmError != null){
-                Text(confirmError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
+            AnimatedVisibility(visible = confirmError != null) {
+                if (confirmError != null) Text(confirmError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
             }
 
             Spacer(Modifier.height(16.dp))
@@ -218,7 +221,7 @@ private fun RegisterScreen(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if(isSubmitting){
-                    CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(19.dp))
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.onPrimary, strokeWidth = 2.dp, modifier = Modifier.size(19.dp))
                     Spacer(Modifier.width(8.dp))
                     Text("Creando cuenta...")
                 } else {
@@ -226,11 +229,16 @@ private fun RegisterScreen(
                 }
             }
 
-            if (errorMsg != null) {
-                Spacer(Modifier.height(8.dp))
-                Text(errorMsg, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
+            AnimatedVisibility(visible = errorMsg != null) {
+                if (errorMsg != null) {
+                    Spacer(Modifier.height(8.dp))
+                    Text(
+                        text = errorMsg,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
             }
-
             Spacer(Modifier.height(12.dp))
 
             OutlinedButton(onClick = onGoLogin, modifier = Modifier.fillMaxWidth()) {

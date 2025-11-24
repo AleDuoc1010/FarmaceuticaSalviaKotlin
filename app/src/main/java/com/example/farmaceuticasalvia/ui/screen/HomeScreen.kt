@@ -1,7 +1,7 @@
 package com.example.farmaceuticasalvia.ui.screen
 
+import android.util.Log
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -18,7 +18,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.PersonOff
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ElevatedCard
@@ -37,19 +36,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.farmaceuticasalvia.data.local.products.ProductEntity
+import com.example.farmaceuticasalvia.R
 import androidx.compose.foundation.lazy.items
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.layout.ContentScale
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
 import com.example.farmaceuticasalvia.data.local.storage.UserPreferences
+import com.example.farmaceuticasalvia.data.remote.dto.ProductoResponse
+import com.example.farmaceuticasalvia.data.utils.fixImageUrl
 import com.example.farmaceuticasalvia.ui.components.BuyModal
 import com.example.farmaceuticasalvia.ui.components.CartModal
 import com.example.farmaceuticasalvia.ui.theme.Beige
 import com.example.farmaceuticasalvia.ui.theme.Blue
 import com.example.farmaceuticasalvia.ui.viewmodel.ActiveModal
 import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
-
-
-
 
 @Composable
 fun HomeScreen(
@@ -65,6 +67,10 @@ fun HomeScreen(
     val activeModal by productViewModel.activeModal.collectAsState()
 
     val bg = Beige
+
+    LaunchedEffect(Unit) {
+        productViewModel.refreshData()
+    }
 
     Box(
         modifier = Modifier
@@ -130,7 +136,7 @@ fun HomeScreen(
 }
 @Composable
 private fun FeaturedProductCard(
-    product: ProductEntity,
+    product: ProductoResponse,
     onBuyClick: () -> Unit,
     onCartClick: () -> Unit
 ){
@@ -143,20 +149,27 @@ private fun FeaturedProductCard(
             modifier = Modifier.padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Image(
-                painter = painterResource(id = product.imageRes),
-                contentDescription = product.name,
-                modifier = Modifier.size(80.dp),
-                alignment = Alignment.Center
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(fixImageUrl(LocalContext.current,product.imagenUrl))
+                    .crossfade(true)
+                    .build(),
+                placeholder = painterResource(R.drawable.ic_launcher_foreground),
+                error = painterResource(R.drawable.ic_launcher_foreground),
+                contentDescription = product.nombre,
+                modifier = Modifier.size(100.dp),
+                contentScale = ContentScale.Fit
             )
             Text(
-                product.name,
+                product.nombre,
                 style = MaterialTheme.typography.titleMedium,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                maxLines = 2
             )
             Text(
-                "$${product.price}",
-                style = MaterialTheme.typography.bodyMedium
+                "$${product.precio.toInt()}",
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Bold
             )
             Spacer(Modifier.height(12.dp))
 

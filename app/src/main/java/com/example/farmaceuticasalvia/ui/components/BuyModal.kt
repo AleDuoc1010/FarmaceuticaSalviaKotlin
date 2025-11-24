@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.OutlinedTextField
@@ -23,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.runtime.mutableStateOf
@@ -82,10 +84,12 @@ fun BuyModal(
 
     if(selectedProduct != null){
         AlertDialog(
-            onDismissRequest = {productViewModel.onModalDismiss()},
+            onDismissRequest = {
+                if (!modalUiState.isLoading) productViewModel.onModalDismiss()
+            },
 
             title = {
-                Text("Comprar ${selectedProduct!!.name}")
+                Text("Comprar ${selectedProduct!!.nombre}")
             },
 
             text = {
@@ -100,7 +104,8 @@ fun BuyModal(
                         },
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Number
-                        )
+                        ),
+                        enabled = !modalUiState.isLoading
                     )
                     Spacer(Modifier.height(16.dp))
 
@@ -114,14 +119,16 @@ fun BuyModal(
                         },
                         keyboardOptions = KeyboardOptions.Default.copy(
                             keyboardType = KeyboardType.Phone
-                        )
+                        ),
+                        enabled = !modalUiState.isLoading
                     )
                     Spacer(Modifier.height(8.dp))
 
-                    if(selectedProduct!!.requireRecipe){
+                    if(selectedProduct!!.pideReceta){
                         CameraSection(
                             photoUriString = modalUiState.photoUriString,
                             error = recipeError,
+                            enabled = !modalUiState.isLoading,
                             onTakePhoto = {
                                 val file = createTempImageFile(context)
                                 val uri = getImageUriForFile(context,file)
@@ -134,13 +141,28 @@ fun BuyModal(
                             }
                         )
                     }
+                    if (modalUiState.errorMessage != null) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = modalUiState.errorMessage!!,
+                            color = MaterialTheme.colorScheme.error
+                        )
+                    }
                 }
             },
             confirmButton = {
                 Button(
-                    onClick = {productViewModel.onConfirmBuy()}
+                    onClick = {productViewModel.onConfirmBuy()},
+                    enabled = !modalUiState.isLoading
                 ) {
-                    Text("Confirmar")
+                    if (modalUiState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                    } else {
+                        Text("Confirmar")
+                    }
                 }
             },
 
@@ -159,6 +181,7 @@ fun BuyModal(
 private fun CameraSection(
     photoUriString: String?,
     error: String?,
+    enabled: Boolean,
     onTakePhoto: () -> Unit,
     onDeletePhoto: () -> Unit
 ) {
@@ -168,7 +191,8 @@ private fun CameraSection(
     ){
         Text(
             "Receta Médica Requerida",
-            style = MaterialTheme.typography.titleMedium
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.primary
         )
         Spacer(Modifier.height(8.dp ))
 
@@ -190,11 +214,11 @@ private fun CameraSection(
         }
 
         Row (horizontalArrangement = Arrangement.spacedBy(8.dp)){
-            Button(onClick = onTakePhoto) {
+            Button(onClick = onTakePhoto, enabled = enabled) {
                 Text(if (photoUriString == null ) "Tomar foto " else "Tomar denuevo")
             }
             if(!photoUriString.isNullOrEmpty()){
-                OutlinedButton(onClick = onDeletePhoto) {
+                OutlinedButton(onClick = onDeletePhoto, enabled = enabled) {
                     Text("Borrar")
                 }
             }

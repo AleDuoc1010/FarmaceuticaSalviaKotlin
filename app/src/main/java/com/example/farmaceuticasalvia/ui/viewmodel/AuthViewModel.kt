@@ -8,7 +8,6 @@ import com.example.farmaceuticasalvia.domain.validation.validateEmail
 import com.example.farmaceuticasalvia.domain.validation.validateName
 import com.example.farmaceuticasalvia.domain.validation.validatePassword
 import com.example.farmaceuticasalvia.domain.validation.validatePhone
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -75,10 +74,12 @@ class AuthViewModel(
 
     fun submitLogin(){
         val s = _login.value
+
         if (!s.canSubmit || s.isSubmitting) return
+
         viewModelScope.launch {
+
             _login.update { it.copy(isSubmitting = true, errorMsg = null, success = false) }
-            delay(500)
 
             val result = repository.login(s.email.trim(), s.pass)
 
@@ -126,8 +127,9 @@ class AuthViewModel(
 
     fun onRegisterPhoneChange(value: String) {
         val digitsOnly = value.filter { it.isDigit() }
+        val finalPhone = if (digitsOnly.length > 9) digitsOnly.take(9) else digitsOnly
         _register.update {
-            it.copy(phone = digitsOnly, phoneError = validatePhone(digitsOnly))
+            it.copy(phone = finalPhone, phoneError = validatePhone(finalPhone))
         }
         recomputeRegisterCanSubmit()
     }
@@ -146,9 +148,9 @@ class AuthViewModel(
     fun submitRegister(){
         val s = _register.value
         if (!s.canSubmit || s.isSubmitting) return
+
         viewModelScope.launch {
             _register.update { it.copy(isSubmitting = true, errorMsg = null, success = false) }
-            delay(700)
 
             val result = repository.register(
                 name = s.name.trim(),
@@ -161,7 +163,7 @@ class AuthViewModel(
                 if (result.isSuccess) {
                     it.copy(isSubmitting = false, success = true, errorMsg = null)
                 } else {
-                    it.copy(isSubmitting = false, success = true, errorMsg = result.exceptionOrNull()?.message ?: "No se pudo registrar")
+                    it.copy(isSubmitting = false, success = false, errorMsg = result.exceptionOrNull()?.message ?: "No se pudo registrar")
                 }
             }
         }

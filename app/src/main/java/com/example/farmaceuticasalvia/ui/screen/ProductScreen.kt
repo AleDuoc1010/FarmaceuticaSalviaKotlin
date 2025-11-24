@@ -20,12 +20,13 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import com.example.farmaceuticasalvia.data.local.products.ProductEntity
+import com.example.farmaceuticasalvia.R
 import com.example.farmaceuticasalvia.ui.components.BuyModal
 import com.example.farmaceuticasalvia.ui.components.CartModal
 import com.example.farmaceuticasalvia.ui.theme.Beige
@@ -33,12 +34,24 @@ import com.example.farmaceuticasalvia.ui.theme.Blue
 import com.example.farmaceuticasalvia.ui.viewmodel.ActiveModal
 import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.example.farmaceuticasalvia.data.remote.dto.ProductoResponse
+import com.example.farmaceuticasalvia.data.utils.fixImageUrl
 
 @Composable
 fun ProductScreen(
-    product: List<ProductEntity>,
+    product: List<ProductoResponse>,
     productViewModel: ProductViewModel
 ){
+
+    LaunchedEffect(Unit) {
+        productViewModel.refreshData()
+    }
+
     LazyColumn(horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier.fillMaxSize()
             .background(Beige)) {
@@ -78,7 +91,7 @@ fun ProductScreen(
 
 @Composable
 fun ProductItem(
-    product: ProductEntity,
+    product: ProductoResponse,
     onBuyClick: () -> Unit,
     onCartClick: () -> Unit){
 
@@ -90,17 +103,39 @@ fun ProductItem(
                 .padding(8.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ){
-            Image(
-                painter = painterResource(id = product.imageRes),
-                contentDescription = product.name,
-                modifier = Modifier.size(100.dp),
-                alignment = Alignment.Center
+            AsyncImage(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(fixImageUrl(LocalContext.current,product.imagenUrl)) // URL que viene de la BD (ej: http://10.0.2.2:8082/...)
+                    .crossfade(true)
+                    .build(),
+                placeholder = painterResource(R.drawable.ic_launcher_foreground), // Imagen mientras carga (opcional)
+                error = painterResource(R.drawable.ic_launcher_foreground), // Imagen si falla la carga (opcional)
+                contentDescription = product.nombre,
+                modifier = Modifier.size(120.dp), // Un poco más grande
+                contentScale = ContentScale.Fit
             )
             Spacer(Modifier.height(16.dp))
 
-            Text(product.name, style = MaterialTheme.typography.titleMedium)
-            Text(product.descr)
-            Text("Precio: $${product.price}")
+            Text(product.nombre, style = MaterialTheme.typography.titleMedium)
+
+            if (product.pideReceta) {
+                Text(
+                    text = "⚠️ Requiere Receta",
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.labelSmall,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Text(product.descripcion, style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(4.dp))
+            Text(
+                text = "Precio: $${product.precio.toInt()}",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold
+            )
+
+            Spacer(Modifier.height(8.dp))
 
             Row(
                 horizontalArrangement = Arrangement.Center,
