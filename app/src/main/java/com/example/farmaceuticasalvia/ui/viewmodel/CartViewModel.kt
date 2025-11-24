@@ -127,6 +127,26 @@ class CartViewModel(
         }
     }
 
+    fun onQuantityChanged(sku: String, currentQuantity: Int, delta: Int) {
+        val newQuantity = currentQuantity + delta
+
+        if (newQuantity < 1) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+
+            val result = cartRepository.updateQuantity(sku, newQuantity)
+
+            if (result.isSuccess) {
+                loadCart()
+            } else {
+                val error = result.exceptionOrNull()?.message ?: "Error al actualizar"
+
+                _uiState.update { it.copy(isLoading = false, errorMsg = error) }
+            }
+        }
+    }
+
     fun onCheckoutSuccessHandled() {
         _uiState.update { it.copy(checkoutSuccess = false) }
     }

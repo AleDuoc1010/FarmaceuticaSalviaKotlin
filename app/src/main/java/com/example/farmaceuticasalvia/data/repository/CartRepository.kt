@@ -101,4 +101,18 @@ class CartRepository(
             Result.failure(e)
         }
     }
+
+    suspend fun updateQuantity(sku: String, quantity: Int): Result<PedidoResponse> {
+        return try {
+            val response = api.updateCartItem(sku, quantity)
+            if (response.isSuccessful && response.body() != null) {
+                Result.success(response.body()!!)
+            } else {
+                val errorMsg = response.errorBody()?.string() ?: "Error al actualizar cantidad"
+                Result.failure(Exception(errorMsg))
+            }
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
 }

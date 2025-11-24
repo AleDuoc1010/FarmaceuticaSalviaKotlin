@@ -119,6 +119,9 @@ fun CartScreen(cartViewModel: CartViewModel){
                         CartItemRow(
                             item = item,
                             onDelete = { cartViewModel.removeFromCart(item.sku) },
+                            onQuantityChange = { delta ->
+                                cartViewModel.onQuantityChanged(item.sku, item.quantity, delta)
+                            },
                             enabled = !state.isLoading
                         )
                         Spacer(Modifier.height(8.dp))
@@ -170,6 +173,7 @@ fun CartScreen(cartViewModel: CartViewModel){
 fun CartItemRow(
     item: CartItemUi,
     onDelete: () -> Unit,
+    onQuantityChange: (Int) -> Unit,
     enabled: Boolean
 ) {
     Card(
@@ -181,7 +185,6 @@ fun CartItemRow(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(12.dp)
         ) {
-            // Imagen Remota
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(fixImageUrl(LocalContext.current,item.imageUrl))
@@ -207,6 +210,40 @@ fun CartItemRow(
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.Gray
                 )
+
+                Spacer(Modifier.height(8.dp))
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+
+                    OutlinedButton(
+                        onClick = { onQuantityChange(-1) },
+                        enabled = enabled && item.quantity > 1,
+                        modifier = Modifier.size(30.dp),
+                        shape = MaterialTheme.shapes.small,
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                    ) {
+                        Text("-", fontWeight = FontWeight.Bold)
+                    }
+
+                    Text(
+                        text = "${item.quantity}",
+                        modifier = Modifier.padding(horizontal = 12.dp),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+
+                    OutlinedButton(
+                        onClick = { onQuantityChange(1) },
+                        enabled = enabled,
+                        modifier = Modifier.size(30.dp),
+                        shape = MaterialTheme.shapes.small,
+                        contentPadding = androidx.compose.foundation.layout.PaddingValues(0.dp)
+                    ) {
+                        Text("+", fontWeight = FontWeight.Bold)
+                    }
+                }
+                Spacer(Modifier.height(8.dp))
+
                 Text(
                     text = "Subtotal: $${item.subtotal.toInt()}",
                     style = MaterialTheme.typography.bodySmall,

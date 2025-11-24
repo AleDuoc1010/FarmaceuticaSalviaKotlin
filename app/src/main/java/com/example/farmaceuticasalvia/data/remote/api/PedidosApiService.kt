@@ -7,7 +7,9 @@ import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface PedidosApiService {
 
@@ -22,6 +24,12 @@ interface PedidosApiService {
 
     @DELETE("pedidos/carrito/{sku}")
     suspend fun eliminarItemCarrito(@Path("sku") sku: String): Response<Void>
+
+    @PUT("pedidos/carrito/{sku}")
+    suspend fun updateCartItem(
+        @Path("sku") sku: String,
+        @Query("cantidad") cantidad: Int
+    ): Response<PedidoResponse>
 
     @DELETE("pedidos/carrito")
     suspend fun vaciarCarrito(): Response<Void>

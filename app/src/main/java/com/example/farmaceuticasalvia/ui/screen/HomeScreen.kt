@@ -1,6 +1,5 @@
 package com.example.farmaceuticasalvia.ui.screen
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -38,8 +37,12 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.farmaceuticasalvia.R
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
@@ -51,16 +54,20 @@ import com.example.farmaceuticasalvia.ui.components.CartModal
 import com.example.farmaceuticasalvia.ui.theme.Beige
 import com.example.farmaceuticasalvia.ui.theme.Blue
 import com.example.farmaceuticasalvia.ui.viewmodel.ActiveModal
+import com.example.farmaceuticasalvia.ui.viewmodel.HomeViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
 
 @Composable
 fun HomeScreen(
-    productViewModel: ProductViewModel
+    productViewModel: ProductViewModel,
+    homeViewModel: HomeViewModel
 ){
     val context = LocalContext.current
 
     val userPrefs = remember { UserPreferences(context) }
     val isLoggedIn by userPrefs.isLoggedIn.collectAsStateWithLifecycle(false)
+
+    val homeState by homeViewModel.uiState.collectAsState()
 
     val featuredProducts by productViewModel.featuredProducts.collectAsState()
     val selectedProduct by productViewModel.selectedProduct.collectAsState()
@@ -82,6 +89,36 @@ fun HomeScreen(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ){
+
+            if (homeState.isLoading) {
+                Text("Cargando indicadores...", style = MaterialTheme.typography.bodySmall)
+            } else if (homeState.dolarValue != null) {
+                Card(
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2F1)), // Verde claro
+                    modifier = Modifier.padding(vertical = 8.dp),
+                    elevation = CardDefaults.cardElevation(2.dp)
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+
+                        Icon(
+                            imageVector = Icons.Filled.AttachMoney,
+                            contentDescription = null,
+                            tint = Color(0xFF00695C)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text(
+                            text = "Dólar: $${homeState.dolarValue} | UF: $${homeState.ufValue}",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color(0xFF004D40),
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ){

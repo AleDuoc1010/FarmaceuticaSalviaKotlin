@@ -28,12 +28,15 @@ import com.example.farmaceuticasalvia.navigation.AppNavGraph
 import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.AuthViewModelFactory
 import com.example.farmaceuticasalvia.data.repository.CartRepository
+import com.example.farmaceuticasalvia.data.repository.ExternalRepository
 import com.example.farmaceuticasalvia.ui.viewmodel.AdminUsersViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.AdminUsersViewModelFactory
 import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModelFactory
 import com.example.farmaceuticasalvia.ui.viewmodel.HistoryViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.HistoryViewModelFactory
+import com.example.farmaceuticasalvia.ui.viewmodel.HomeViewModel
+import com.example.farmaceuticasalvia.ui.viewmodel.HomeViewModelFactory
 import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModelFactory
 
@@ -81,11 +84,13 @@ fun AppRoot() {
     val usuarioApi = RetrofitClient.getUsuariosApi(context)
     val catalogoApi = RetrofitClient.getCatalogoApi(context)
     val pedidosApi = RetrofitClient.getPedidosApi(context)
+    val externalApi = RetrofitClient.getExternalApi(context)
 
     val userRepository = UserRepository(usuarioApi, userPreferences)
     val productRepository = ProductRepository(catalogoApi)
     val cartRepository = CartRepository(pedidosApi)
     val historyRepository = HistoryRepository(pedidosApi)
+    val externalRepository = ExternalRepository(externalApi)
 
 
     val authViewModel: AuthViewModel = viewModel(
@@ -108,6 +113,10 @@ fun AppRoot() {
         factory = AdminUsersViewModelFactory(userRepository, userPreferences)
     )
 
+    val homeViewModel: HomeViewModel = viewModel(
+        factory = HomeViewModelFactory(externalRepository)
+    )
+
     val navController = rememberNavController()
     MaterialTheme {
         Surface(color = MaterialTheme.colorScheme.background){
@@ -119,7 +128,8 @@ fun AppRoot() {
                 cartViewModel = cartViewModel,
                 historyViewModel = historyViewModel,
                 adminUsersViewModel = adminUsersViewModel,
-                userPreferences = userPreferences
+                userPreferences = userPreferences,
+                homeViewModel = homeViewModel
             )
         }
     }

@@ -33,6 +33,7 @@ import com.example.farmaceuticasalvia.ui.viewmodel.AdminUsersViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.CartViewModel
 import com.example.farmaceuticasalvia.ui.viewmodel.HistoryViewModel
 import com.example.farmaceuticasalvia.data.local.storage.UserPreferences
+import com.example.farmaceuticasalvia.ui.viewmodel.HomeViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -42,7 +43,8 @@ fun AppNavGraph(navController: NavHostController,
                 cartViewModel: CartViewModel,
                 historyViewModel: HistoryViewModel,
                 adminUsersViewModel: AdminUsersViewModel,
-                userPreferences: UserPreferences){
+                userPreferences: UserPreferences,
+                homeViewModel: HomeViewModel){
 
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
@@ -132,7 +134,8 @@ fun AppNavGraph(navController: NavHostController,
             ){
                 composable(Route.Home.path){
                     HomeScreen(
-                        productViewModel = productViewModel
+                        productViewModel = productViewModel,
+                        homeViewModel = homeViewModel
                     )
                 }
 

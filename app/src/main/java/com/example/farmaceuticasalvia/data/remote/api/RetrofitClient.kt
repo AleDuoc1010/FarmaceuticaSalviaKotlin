@@ -31,6 +31,19 @@ object RetrofitClient {
             .build()
     }
 
+    private val publicOkHttpClient = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .build()
+
+    fun getExternalApi(context: Context): ExternalApiService {
+        return Retrofit.Builder()
+            .baseUrl("https://mindicador.cl/")
+            .client(publicOkHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ExternalApiService::class.java)
+    }
+
     private fun getBaseUrl(context: Context, port: String): String {
         val ipStorage = IpStorage(context)
         val ip = ipStorage.getBaseIp()
