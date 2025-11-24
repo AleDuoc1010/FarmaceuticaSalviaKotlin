@@ -11,7 +11,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import com.example.farmaceuticasalvia.CHANNEL_ID
 
-fun showPurchaseNotification(context: Context, productName: String) {
+fun showSimpleNotification(context: Context, title: String, message: String) {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU){
         if(ContextCompat.checkSelfPermission(
@@ -25,13 +25,13 @@ fun showPurchaseNotification(context: Context, productName: String) {
     }
 
     val builder = NotificationCompat.Builder(context, CHANNEL_ID)
-        .setSmallIcon(R.drawable.ibuprofeno)
-        .setContentTitle("Compra Exitosa")
-        .setContentText("Tu compra de ${productName} se ha realizado.")
+        .setSmallIcon(R.drawable.ic_launcher_foreground)
+        .setContentTitle(title)
+        .setContentText(message)
         .setPriority(NotificationCompat.PRIORITY_DEFAULT)
         .setAutoCancel(true)
 
     with(NotificationManagerCompat.from(context)){
-        notify(productName.hashCode(), builder.build())
+        notify(message.hashCode(), builder.build())
     }
 }

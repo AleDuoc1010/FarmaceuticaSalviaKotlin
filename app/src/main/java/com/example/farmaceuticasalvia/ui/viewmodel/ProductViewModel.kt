@@ -27,6 +27,8 @@ data class ProductUiState(
     val errorMessage: String? = null
 )
 
+data class NotificationEvent( val title: String, val message: String)
+
 class ProductViewModel(
     private val repository: ProductRepository,
     private val cartRepository: CartRepository,
@@ -56,8 +58,8 @@ class ProductViewModel(
     private val _phoneError = MutableStateFlow<String?>(null)
     val phoneError: StateFlow<String?> = _phoneError.asStateFlow()
 
-    private val _showPurchaseNotificationEvent = MutableSharedFlow<String>()
-    val showPurchaseNotificationEvent = _showPurchaseNotificationEvent.asSharedFlow()
+    private val _notificationEvent = MutableSharedFlow<NotificationEvent>()
+    val notificationEvent = _notificationEvent.asSharedFlow()
 
     private val _showErrorEvent = MutableSharedFlow<String>()
 
@@ -159,7 +161,12 @@ class ProductViewModel(
             _modalUiState.update { it.copy(isLoading = false) }
 
             result.onSuccess {
-                _showPurchaseNotificationEvent.emit("Compra exitosa: ${product.nombre}")
+                _notificationEvent.emit(
+                    NotificationEvent(
+                        title = "Compra Exitosa",
+                        message = "Has comprado ${product.nombre} correctamente"
+                    )
+                )
                 onModalDismiss()
             }.onFailure { e ->
                 _showErrorEvent.emit(e.message ?: "Error al comprar")
@@ -194,7 +201,12 @@ class ProductViewModel(
             _modalUiState.update { it.copy(isLoading = false) }
 
             result.onSuccess {
-                _showPurchaseNotificationEvent.emit("Agregado al carrito: ${product.nombre}")
+                _notificationEvent.emit(
+                    NotificationEvent(
+                        title = "Carrito actualizado",
+                        message = "${product.nombre} fue añadido al carrito."
+                    )
+                )
                 onModalDismiss()
             }.onFailure { e ->
                 _showErrorEvent.emit(e.message ?: "Error al agregar")

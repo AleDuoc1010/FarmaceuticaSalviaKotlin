@@ -5,7 +5,7 @@
 
     <style name= "Theme.FarmaceuticaSalvia.Splash" parent="Theme.SplashScreen">
 
-        <item name="windowSplashScreenBackground">@android:color/white</item>
+        <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
 
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
 

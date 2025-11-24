@@ -26,7 +26,7 @@ import com.example.farmaceuticasalvia.ui.viewmodel.ProductViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.farmaceuticasalvia.domain.validation.showPurchaseNotification
+import com.example.farmaceuticasalvia.domain.validation.showSimpleNotification
 import com.example.farmaceuticasalvia.ui.screen.AdminUsersScreen
 import com.example.farmaceuticasalvia.ui.screen.HistoryScreen
 import com.example.farmaceuticasalvia.ui.viewmodel.AdminUsersViewModel
@@ -61,8 +61,8 @@ fun AppNavGraph(navController: NavHostController,
 
     val context = LocalContext.current
     LaunchedEffect(key1 = Unit) {
-        productViewModel.showPurchaseNotificationEvent.collect { productName ->
-            showPurchaseNotification(context, productName)
+        productViewModel.notificationEvent.collect { event ->
+            showSimpleNotification(context, event.title, event.message)
         }
     }
 
