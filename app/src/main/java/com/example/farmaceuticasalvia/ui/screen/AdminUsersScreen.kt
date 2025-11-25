@@ -26,7 +26,6 @@ fun AdminUsersScreen(viewModel: AdminUsersViewModel) {
     val state by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
-    // Estado para el diálogo de confirmación
     var userToDelete by remember { mutableStateOf<UsuarioDto?>(null) }
 
     LaunchedEffect(state.errorMsg) {
@@ -77,7 +76,6 @@ fun AdminUsersScreen(viewModel: AdminUsersViewModel) {
         }
     }
 
-    // Diálogo de Confirmación
     if (userToDelete != null) {
         AlertDialog(
             onDismissRequest = { userToDelete = null },
@@ -139,7 +137,6 @@ fun UserItemCard(
                     )
                     Text(text = user.email, style = MaterialTheme.typography.bodySmall)
 
-                    // Badge de Rol
                     Surface(
                         color = if (isAdmin) Color(0xFFFFEBEE) else Color(0xFFE3F2FD),
                         shape = MaterialTheme.shapes.small,
@@ -155,10 +152,9 @@ fun UserItemCard(
                 }
             }
 
-            // Botón Eliminar (Deshabilitado si soy yo)
             IconButton(
                 onClick = onDeleteClick,
-                enabled = !isMe // <--- PROTECCIÓN: No me puedo borrar a mí mismo
+                enabled = !isMe
             ) {
                 Icon(
                     imageVector = Icons.Filled.Delete,

@@ -90,7 +90,6 @@ fun HistoryScreen(historyViewModel: HistoryViewModel) {
         }
         Spacer(Modifier.height(16.dp))
 
-        // --- CONTENIDO ---
         if (state.orders.isEmpty()) {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 if (state.isLoading) {
@@ -124,7 +123,6 @@ private fun HistoryOrderCard(
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
 
-            // --- CABECERA DEL PEDIDO ---
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -143,7 +141,6 @@ private fun HistoryOrderCard(
                     )
                 }
 
-                // Botón Eliminar Pedido Específico
                 IconButton(onClick = onDeleteOrder) {
                     Icon(
                         imageVector = Icons.Filled.Delete,
@@ -176,7 +173,6 @@ private fun HistoryItemRow(item: HistoryItemUi) {
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.fillMaxWidth()
     ) {
-        // Imagen del Producto (Desde URL)
         AsyncImage(
             model = ImageRequest.Builder(LocalContext.current)
                 .data(fixImageUrl(LocalContext.current,item.imageUrl))

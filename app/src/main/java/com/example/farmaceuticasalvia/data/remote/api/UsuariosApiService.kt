@@ -24,7 +24,7 @@ interface UsuariosApiService {
     @GET("usuarios")
     suspend fun getAllUsers(
         @Query("page") page: Int = 0,
-        @Query("size") size: Int = 50 // Traemos bastantes
+        @Query("size") size: Int = 50
     ): Response<PageResponse<UsuarioDto>>
 
     @DELETE("usuarios/{uuid}")

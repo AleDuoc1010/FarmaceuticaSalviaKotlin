@@ -94,7 +94,7 @@ fun HomeScreen(
                 Text("Cargando indicadores...", style = MaterialTheme.typography.bodySmall)
             } else if (homeState.dolarValue != null) {
                 Card(
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2F1)), // Verde claro
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE0F2F1)),
                     modifier = Modifier.padding(vertical = 8.dp),
                     elevation = CardDefaults.cardElevation(2.dp)
                 ) {

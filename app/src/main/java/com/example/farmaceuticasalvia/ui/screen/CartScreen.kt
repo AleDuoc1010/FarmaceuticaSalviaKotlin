@@ -62,7 +62,7 @@ fun CartScreen(cartViewModel: CartViewModel){
 
     LaunchedEffect(state.checkoutSuccess) {
         if (state.checkoutSuccess) {
-            Toast.makeText(context, "Se ha agregado el producto", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "Compra realizada con exito", Toast.LENGTH_LONG).show()
             cartViewModel.onCheckoutSuccessHandled()
             cartViewModel.loadCart()
         }
@@ -80,7 +80,6 @@ fun CartScreen(cartViewModel: CartViewModel){
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
-            // --- ENCABEZADO ---
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,

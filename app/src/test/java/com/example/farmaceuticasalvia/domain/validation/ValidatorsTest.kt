@@ -5,7 +5,6 @@ import org.junit.Test
 
 class ValidatorsTest {
 
-    // --- NOMBRE ---
     @Test
     fun `validateName retorna error si esta vacio`() {
         assertEquals("El nombre es obligatorio", validateName(""))
@@ -21,7 +20,6 @@ class ValidatorsTest {
         assertNull(validateName("Juan Pérez"))
     }
 
-    // --- TELEFONO ---
     @Test
     fun `validatePhone retorna error si es corto`() {
         assertEquals("El telefono debe tener 9 digitos", validatePhone("12345"))
@@ -37,7 +35,6 @@ class ValidatorsTest {
         assertNull(validatePhone("912345678"))
     }
 
-    // --- PASSWORD ---
     @Test
     fun `validatePassword detecta longitud corta`() {
         assertEquals("La contraseña debe tener un minimo de 6 caracteres", validatePassword("123"))
@@ -60,7 +57,6 @@ class ValidatorsTest {
 
     @Test
     fun `validatePassword requiere simbolo`() {
-        // Tu lógica dice !it.isLetterOrDigit(), o sea requiere un símbolo
         assertEquals("La contraseña debe tener al menos un simbolo", validatePassword("Admin123"))
     }
 
@@ -74,7 +70,6 @@ class ValidatorsTest {
         assertNull(validatePassword("Admin123!"))
     }
 
-    // --- CONFIRMACION ---
     @Test
     fun `validateConfirm detecta diferencias`() {
         assertEquals("Las contraseñas no son iguales", validateConfirm("123", "124"))

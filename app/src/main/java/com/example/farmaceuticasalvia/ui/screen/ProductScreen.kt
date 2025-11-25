@@ -105,13 +105,13 @@ fun ProductItem(
         ){
             AsyncImage(
                 model = ImageRequest.Builder(LocalContext.current)
-                    .data(fixImageUrl(LocalContext.current,product.imagenUrl)) // URL que viene de la BD (ej: http://10.0.2.2:8082/...)
+                    .data(fixImageUrl(LocalContext.current,product.imagenUrl))
                     .crossfade(true)
                     .build(),
-                placeholder = painterResource(R.drawable.ic_launcher_foreground), // Imagen mientras carga (opcional)
-                error = painterResource(R.drawable.ic_launcher_foreground), // Imagen si falla la carga (opcional)
+                placeholder = painterResource(R.drawable.ic_launcher_foreground),
+                error = painterResource(R.drawable.ic_launcher_foreground),
                 contentDescription = product.nombre,
-                modifier = Modifier.size(120.dp), // Un poco más grande
+                modifier = Modifier.size(120.dp),
                 contentScale = ContentScale.Fit
             )
             Spacer(Modifier.height(16.dp))

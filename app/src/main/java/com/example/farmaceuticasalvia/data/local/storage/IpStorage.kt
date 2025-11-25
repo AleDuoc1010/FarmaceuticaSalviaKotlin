@@ -5,7 +5,6 @@ import android.content.Context
 class IpStorage(context: Context) {
     private val prefs = context.getSharedPreferences("app_config", Context.MODE_PRIVATE)
 
-    // IP por defecto (tu actual), por si acaso
     private val DEFAULT_IP = "192.168.100.218"
 
     fun getBaseIp(): String {

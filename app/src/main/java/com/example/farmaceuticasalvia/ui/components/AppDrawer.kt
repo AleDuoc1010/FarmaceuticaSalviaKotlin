@@ -82,7 +82,6 @@ fun AppDrawer(
                     modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                     colors = NavigationDrawerItemDefaults.colors()
                 )
-                // Un pequeño espacio al final
                 Spacer(modifier = Modifier.height(16.dp))
             }
         }

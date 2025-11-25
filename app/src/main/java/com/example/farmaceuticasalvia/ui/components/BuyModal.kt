@@ -72,7 +72,6 @@ fun BuyModal(
     ) { success ->
         if (success){
             pendingCaptureUri?.let {
-                // Llama al ViewModel en lugar de a un estado local
                 productViewModel.onPhotoTaken(it.toString())
                 Toast.makeText(context,"Receta capturada", Toast.LENGTH_SHORT).show()
             }

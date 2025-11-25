@@ -25,7 +25,6 @@ class ProductValidatorTest {
 
     @Test
     fun `validateQuantity retorna error si es negativo`() {
-        // El check de isDigit() atrapa el signo menos "-", así que devuelve "Solo números"
         val result = validateQuantity("-5")
         assertEquals("Solo números", result)
     }
